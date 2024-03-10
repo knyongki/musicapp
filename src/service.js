@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
+const AlbumsValidator = require('./validator/albums');
 
 // albums
 const albums = require('./api/albums');
@@ -29,6 +30,7 @@ const init = async () => {
       plugin: albums,
       options: {
         service: albumsService,
+        validator: AlbumsValidator,
       },
     },
     {

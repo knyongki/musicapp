@@ -6,14 +6,12 @@ class AlbumsService {
     this._pool = new Pool();
   }
 
-  async addAlbum({
-    name,
-    year,
-  }) {
+  async addAlbum({ name, year }) {
+    console.log('Halo');
     const id = `album-${nanoid(16)}`;
 
     const query = {
-      text: 'INSERT INTO albums VALUES($1, $2, $3)',
+      text: 'INSERT INTO albums VALUES($1, $2, $3) RETURNING id',
       values: [id, name, year],
     };
 

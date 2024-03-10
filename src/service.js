@@ -4,13 +4,16 @@ const Hapi = require('@hapi/hapi');
 
 // albums
 const albums = require('./api/albums');
-const albumsService = require('./services/postgres/albumsService');
+const AlbumsService = require('./services/postgres/albumsService');
 
 // songs
 const songs = require('./api/songs');
-const songsService = require('./services/postgres/songsService');
+const SongsService = require('./services/postgres/songsService');
 
 const init = async () => {
+  const songsService = new SongsService();
+  const albumsService = new AlbumsService();
+
   const server = Hapi.server({
     port: process.env.PORT,
     host: process.env.HOST,

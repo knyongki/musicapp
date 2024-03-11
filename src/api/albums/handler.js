@@ -14,8 +14,9 @@ class AlbumsHandler {
   async postAlbumHandler(request, h) {
     try {
       this._validator.validateAlbumPayload(request.payload);
-      const { name, year } = request.payload;
-      const albumId = await this._service.addAlbum({ name, year });
+      const albums = request.payload;
+
+      const albumId = await this._service.addAlbum({ albums });
 
       const response = h.response({
         status: 'success',
@@ -33,7 +34,6 @@ class AlbumsHandler {
           message: error.message,
         });
         response.code(error.statusCode);
-        console.error(error);
         return response;
       }
       // Server ERROR!
@@ -51,7 +51,6 @@ class AlbumsHandler {
     try {
       const { id } = request.params;
       const album = await this._service.getAlbumById(id);
-      console.log(album);
       return {
         status: 'success',
         data: {
@@ -82,10 +81,9 @@ class AlbumsHandler {
   async putAlbumByIdHandler(request, h) {
     try {
       this._validator.validateAlbumPayload(request.payload);
-      const { name, year } = request.payload;
       const { id } = request.params;
 
-      this._service.editAlbumById(id, { name, year });
+      await this._service.editAlbumById(id, request.payload);
 
       return {
         status: 'success',
@@ -115,7 +113,7 @@ class AlbumsHandler {
   async deleteAlbumByIdHandler(request, h) {
     try {
       const { id } = request.params;
-      this._service.deleteAlbumById(id);
+      await this._service.deleteAlbumById(id);
 
       return {
         status: 'success',

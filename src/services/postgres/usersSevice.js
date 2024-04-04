@@ -1,5 +1,5 @@
 const { nanoid } = require('nanoid');
-const Pool = require('pg');
+const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
@@ -41,7 +41,7 @@ class UsersService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows[0].length) {
+    if (!result.rows.length) {
       throw new InvariantError('Gagal menambahkan user, username sudah digunakan');
     }
 
@@ -56,7 +56,7 @@ class UsersService {
 
     const result = this._pool.query(query);
 
-    if (!result.rows[0].length) {
+    if (!result.rows.length) {
       throw new NotFoundError('User tidak ditemukan');
     }
 

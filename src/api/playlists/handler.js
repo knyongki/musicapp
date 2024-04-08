@@ -44,7 +44,7 @@ class PlaylistsHandler {
 
     return {
       status: 'success',
-      message: 'Lagu berhasil dihapus',
+      message: 'Playlist berhasil dihapus',
     };
   }
 }

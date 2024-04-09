@@ -1,6 +1,7 @@
 class PlaylistSongsHandler {
-  constructor(service, validator) {
+  constructor(service, playlistService, validator) {
     this._service = service;
+    this._playlistService = playlistService;
     this._validator = validator;
 
     this.postSongToPlaylistHandler = this.postSongToPlaylistHandler.bind(this);
@@ -12,6 +13,9 @@ class PlaylistSongsHandler {
     this._validator.validatePlaylistSongPayload(request.payload);
     const { id } = request.params;
     const { songId } = request.payload;
+    const { id: credentialId } = request.auth.credentials;
+
+    await this._playlistService.verifyPlaylistAccess(id, credentialId);
 
     const SongInPlaylistId = await this._service.addSongToPlaylist({ id, songId });
 
@@ -28,6 +32,9 @@ class PlaylistSongsHandler {
 
   async getSongsInPlaylistHandler(request) {
     const { id } = request.params;
+    const { id: credentialId } = request.auth.credentials;
+
+    await this._playlistService.verifyPlaylistAccess(id, credentialId);
     const playlist = await this._service.getSongsInPlaylist(id);
     return {
       status: 'success',
@@ -39,7 +46,11 @@ class PlaylistSongsHandler {
 
   async deleteSongInPlaylistHandler(request) {
     this._validator.validatePlaylistSongPayload(request.payload);
+    const { id } = request.params;
     const { songId } = request.payload;
+    const { id: credentialId } = request.auth.credentials;
+
+    await this._playlistService.verifyPlaylistAccess(id, credentialId);
 
     await this._service.deleteSongsInPlaylist(songId);
 

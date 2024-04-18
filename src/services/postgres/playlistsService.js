@@ -32,7 +32,10 @@ class PlaylistsService {
         SELECT playlists.id, playlists.name, users.username
         FROM playlists
         JOIN users ON playlists.owner = users.id
-        WHERE playlists.owner = $1
+        JOIN collaborations ON collaborations.playlist_id = playlists.id
+        WHERE playlists.owner = $1 OR collaborations.user_id = $1
+        GROUP BY playlists.id, playlists.name, users.username
+        ORDER BY playlists.id
       `,
       values: [owner],
     };
@@ -56,6 +59,21 @@ class PlaylistsService {
   }
 
   async verifyPlaylistAccess(playlistId, userId) {
+    try {
+      await this.verifyPlaylistOwner(playlistId, userId);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+      try {
+        await this.verifyCollaborator(playlistId, userId);
+      } catch {
+        throw error;
+      }
+    }
+  }
+
+  async verifyPlaylistOwner(playlistId, userId) {
     const query = {
       text: 'SELECT * FROM playlists WHERE id = $1',
       values: [playlistId],
@@ -67,10 +85,23 @@ class PlaylistsService {
       throw new NotFoundError('Playlist tidak ditemukan');
     }
 
-    const playlist = result.rows[0];
+    if (result.rows[0].owner !== userId) {
+      throw new AuthorizationError('Anda tidak memiliki akses ke playlist ini');
+    }
+  }
 
-    if (playlist.owner !== userId) {
-      throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+  async verifyCollaborator(playlistId, userId) {
+    const query = {
+      text: 'SELECT * FROM collaborations WHERE playlist_id = $1 AND user_id = $2',
+      values: [playlistId, userId],
+    };
+
+    console.log(playlistId);
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new InvariantError('Kolaborasi gagal diverifikasi');
     }
   }
 }

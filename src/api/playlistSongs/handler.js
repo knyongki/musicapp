@@ -1,7 +1,8 @@
 class PlaylistSongsHandler {
-  constructor(service, playlistService, validator) {
+  constructor(service, playlistService, activitiesService, validator) {
     this._service = service;
     this._playlistService = playlistService;
+    this._activitiesService = activitiesService;
     this._validator = validator;
 
     this.postSongToPlaylistHandler = this.postSongToPlaylistHandler.bind(this);
@@ -16,8 +17,13 @@ class PlaylistSongsHandler {
     const { id: credentialId } = request.auth.credentials;
 
     await this._playlistService.verifyPlaylistAccess(id, credentialId);
-
     const SongInPlaylistId = await this._service.addSongToPlaylist({ id, songId });
+
+    const action = 'add';
+    const time = new Date().toISOString();
+    await this._activitiesService.addPlaylistSongActivities(id, {
+      songId, credentialId, action, time,
+    });
 
     const response = h.response({
       status: 'success',
@@ -51,8 +57,13 @@ class PlaylistSongsHandler {
     const { id: credentialId } = request.auth.credentials;
 
     await this._playlistService.verifyPlaylistAccess(id, credentialId);
-
     await this._service.deleteSongsInPlaylist(songId);
+
+    const action = 'delete';
+    const time = new Date().toISOString();
+    await this._activitiesService.addPlaylistSongActivities(id, {
+      songId, credentialId, action, time,
+    });
 
     return {
       status: 'success',

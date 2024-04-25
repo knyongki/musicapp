@@ -12,8 +12,6 @@ class AlbumsService {
   async addAlbum({ name, year }) {
     const id = `album-${nanoid(16)}`;
 
-    console.log(name);
-
     const query = {
       text: 'INSERT INTO albums VALUES($1, $2, $3) RETURNING id',
       values: [id, name, year],

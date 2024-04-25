@@ -29,13 +29,11 @@ class PlaylistsService {
   async getPlaylists(owner) {
     const query = {
       text: `
-        SELECT playlists.id, playlists.name, users.username
-        FROM playlists
-        JOIN users ON playlists.owner = users.id
-        JOIN collaborations ON collaborations.playlist_id = playlists.id
-        WHERE playlists.owner = $1 OR collaborations.user_id = $1
-        GROUP BY playlists.id, playlists.name, users.username
-        ORDER BY playlists.id
+        SELECT p.id AS id, p.name AS name, u.username AS username
+        FROM playlists AS p
+        LEFT JOIN users AS u ON p.owner = u.id
+        LEFT JOIN collaborations AS c ON c.playlist_id = p.id
+        WHERE p.owner = $1 OR c.user_id = $1
       `,
       values: [owner],
     };
@@ -51,10 +49,15 @@ class PlaylistsService {
       values: [id],
     };
 
-    const result = await this._pool.query(query);
+    try {
+      const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
-      throw new NotFoundError('Gagal menghapus playlists, Id tidak ditemukan');
+      if (!result.rows.length) {
+        throw new NotFoundError('Gagal menghapus playlists, Id tidak ditemukan');
+      }
+    } catch (error) {
+      console.error('Error saat menghapus playlist:', error);
+      throw error; // Melempar error agar dapat ditangkap oleh pengguna fungsi ini
     }
   }
 
@@ -95,8 +98,6 @@ class PlaylistsService {
       text: 'SELECT * FROM collaborations WHERE playlist_id = $1 AND user_id = $2',
       values: [playlistId, userId],
     };
-
-    console.log(playlistId);
 
     const result = await this._pool.query(query);
 

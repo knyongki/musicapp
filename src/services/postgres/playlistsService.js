@@ -44,7 +44,6 @@ class PlaylistsService {
   }
 
   async getPlaylistById(id) {
-    console.log(id);
     const query = {
       text: 'SELECT id FROM playlists WHERE id = $1',
       values: [id],

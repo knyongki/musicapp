@@ -13,8 +13,8 @@ class AlbumsService {
     const id = `album-${nanoid(16)}`;
 
     const query = {
-      text: 'INSERT INTO albums VALUES($1, $2, $3) RETURNING id',
-      values: [id, name, year],
+      text: 'INSERT INTO albums VALUES($1, $2, $3, $4) RETURNING id',
+      values: [id, name, year, null],
     };
 
     const result = await this._pool.query(query);
@@ -28,7 +28,7 @@ class AlbumsService {
 
   async getAlbumById(id) {
     const query = {
-      text: 'SELECT id, name, year FROM albums WHERE id = $1',
+      text: 'SELECT * FROM albums WHERE id = $1',
       values: [id],
     };
 
@@ -44,9 +44,12 @@ class AlbumsService {
       values: [album.id],
     };
 
-    await this._pool.query(querySong);
+    const songResult = await this._pool.query(querySong);
 
-    return result.rows[0];
+    // Menambahkan data lagu ke album
+    album.songs = songResult.rows;
+
+    return album;
   }
 
   async editAlbumById(id, { name, year }) {

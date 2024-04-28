@@ -1,10 +1,8 @@
 const fs = require('fs');
-const { Pool } = require('pg');
 
 class StorageService {
   constructor(folder) {
     this._folder = folder;
-    this._pool = new Pool();
 
     if (!fs.existsSync(folder)) {
       fs.mkdirSync(folder, { recursive: true });
@@ -22,15 +20,6 @@ class StorageService {
       file.pipe(fileSteam);
       file.on('end', () => resolve(filename));
     });
-  }
-
-  async updatePlaylistCover(playlistId, coverUrl) {
-    const query = {
-      text: 'UPDATE playlists SET coverUrl = $1 WHERE id = $2',
-      values: [coverUrl, playlistId],
-    };
-
-    await this._pool.query(query);
   }
 }
 

@@ -7,13 +7,13 @@ class PlaylistSongActivities {
   }
 
   async addPlaylistSongActivities(playlistId, {
-    songId, userId, action, time,
+    songId, credentialId, action, time,
   }) {
     const id = `action-${nanoid(16)}`;
 
     const query = {
       text: 'INSERT INTO playlist_song_activities VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
-      values: [id, playlistId, songId, userId, action, time],
+      values: [id, playlistId, songId, credentialId, action, time],
     };
 
     await this._pool.query(query);

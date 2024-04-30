@@ -32,6 +32,7 @@ const routes = (handler) => [
         output: 'stream',
         maxBytes: 512000,
       },
+      auth: 'musicapp_jwt',
     },
   },
   {
@@ -42,6 +43,30 @@ const routes = (handler) => [
         path: path.join(__dirname, '/file/images'),
       },
     },
+    options: {
+      auth: 'musicapp_jwt',
+    },
+  },
+  {
+    method: 'POST',
+    path: '/albums/{id}/likes',
+    handler: handler.postLikeAlbumHandler,
+    options: {
+      auth: 'musicapp_jwt',
+    },
+  },
+  {
+    method: 'DELETE',
+    path: '/albums/{id}/likes',
+    handler: handler.deleteLikeAlbumHandler,
+    options: {
+      auth: 'musicapp_jwt',
+    },
+  },
+  {
+    method: 'GET',
+    path: '/albums/{id}/likes',
+    handler: handler.getLikesAlbumHandler,
   },
 ];
 

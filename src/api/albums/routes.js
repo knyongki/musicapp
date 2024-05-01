@@ -32,19 +32,15 @@ const routes = (handler) => [
         output: 'stream',
         maxBytes: 512000,
       },
-      auth: 'musicapp_jwt',
     },
   },
   {
     method: 'GET',
-    path: '/albums/images/{param*}',
+    path: '/albums/file/images/{param*}',
     handler: {
       directory: {
         path: path.join(__dirname, '/file/images'),
       },
-    },
-    options: {
-      auth: 'musicapp_jwt',
     },
   },
   {

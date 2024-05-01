@@ -34,6 +34,7 @@ class AlbumsHandler {
   async getAlbumByIdHandler(request) {
     const { id } = request.params;
     const album = await this._service.getAlbumById(id);
+
     return {
       status: 'success',
       data: {
@@ -69,10 +70,9 @@ class AlbumsHandler {
     const { cover } = request.payload;
     console.log(id);
     this._validator.validateAlbumCoverHeaders(cover.hapi.headers);
-    console.log('p');
 
     const filename = await this._storageService.writeFile(cover, cover.hapi);
-    const url = `http://${process.env.HOST}:${process.env.PORT}/upload/images/${filename}`;
+    const url = `http://${process.env.HOST}:${process.env.PORT}/albums/file/images/${filename}`;
     await this._service.editAlbumCoverById(id, url);
 
     const response = h.response({
@@ -98,15 +98,24 @@ class AlbumsHandler {
     return response;
   }
 
-  async getLikesAlbumHandler(request) {
+  async getLikesAlbumHandler(request, h) {
     const { id } = request.params;
-    const likes = await this._service.getLikesAlbum(id);
-    return {
+    const { isCache, result } = await this._service.getLikesAlbum(id);
+
+    const response = h.response({
       status: 'success',
       data: {
-        likes,
+        likes: result,
       },
-    };
+    });
+
+    if (isCache) {
+      response.header('X-Data-Source', 'cache');
+    } else {
+      response.header('X-Data-Source', 'not-cache');
+    }
+
+    return response;
   }
 
   async deleteLikeAlbumHandler(request) {

@@ -83,14 +83,18 @@ class AlbumsService {
 
   async editAlbumCoverById(id, path) {
     const query = {
-      text: 'UPDATE albums SET cover = $1 WHERE id = $2 RETURNING id',
+      text: 'UPDATE albums SET "coverUrl" = $1 WHERE id = $2',
       values: [path, id],
     };
 
-    const result = await this._pool.query(query);
-
-    if (!result.rows.length) {
-      throw new NotFoundError('Gagal memperbarui album. Id tidak ditemukan.');
+    try {
+      const result = await this._pool.query(query);
+      if (result.rowCount === 0) {
+        throw new NotFoundError('Gagal memperbarui album. Id tidak ditemukan.');
+      }
+    } catch (error) {
+      console.error('Error during query execution:', error);
+      throw error; // Mengembalikan error untuk ditangani di luar fungsi ini
     }
   }
 
@@ -135,7 +139,10 @@ class AlbumsService {
   async getLikesAlbum(id) {
     try {
       const result = await this._cacheService.get(`album_likes:${id}`);
-      return JSON.parse(result);
+      return {
+        isCache: true,
+        result: JSON.parse(result),
+      };
     } catch (error) {
       const query = {
         text: 'SELECT * FROM album_likes WHERE album_id = $1',
@@ -146,7 +153,10 @@ class AlbumsService {
 
       await this._cacheService.set(`album_likes:${id}`, JSON.stringify(likes.rowCount));
 
-      return likes.rowCount;
+      return {
+        isCache: false,
+        result: likes.rowCount,
+      };
     }
   }
 }

@@ -4,6 +4,7 @@ const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
 const Inert = require('@hapi/inert');
 const path = require('path');
+
 const ClientError = require('./exceptions/ClientError');
 
 // albums
@@ -53,9 +54,13 @@ const ExportsValidator = require('./validator/export');
 
 const StorageService = require('./services/storage/storageService');
 
+// cache
+const CacheService = require('./services/redis/CacheSevice');
+
 const init = async () => {
+  const cacheService = new CacheService();
   const songsService = new SongsService();
-  const albumsService = new AlbumsService();
+  const albumsService = new AlbumsService(cacheService);
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
   const playlistsService = new PlaylistsService();

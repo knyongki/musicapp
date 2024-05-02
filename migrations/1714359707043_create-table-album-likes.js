@@ -22,9 +22,15 @@ exports.up = (pgm) => {
   });
 
   pgm.addConstraint(
-    'album_likes', // nama tabel
-    'fk-album_likes.user_id-users.id', // nama constraint / nama relasi
-    'FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE', // constraint
+    'album_likes',
+    'fk-album_likes.user_id-users.id',
+    'FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE',
+  );
+
+  pgm.addConstraint(
+    'album_likes',
+    'fk-album_likes.album_id-albums.id',
+    'FOREIGN KEY(album_id) REFERENCES albums(id) ON DELETE CASCADE',
   );
 };
 

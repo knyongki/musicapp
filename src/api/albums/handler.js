@@ -68,7 +68,6 @@ class AlbumsHandler {
   async postAlbumCoverHandler(request, h) {
     const { id } = request.params;
     const { cover } = request.payload;
-    console.log(id);
     this._validator.validateAlbumCoverHeaders(cover.hapi.headers);
 
     const filename = await this._storageService.writeFile(cover, cover.hapi);

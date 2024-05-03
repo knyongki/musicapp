@@ -12,10 +12,10 @@ class ExportsHandler {
     const { id } = request.params;
     const { id: credentialId } = request.auth.credentials;
     await this._playlistService.verifyPlaylistOwner(id, credentialId);
-    const result = await this._playlistService.getPlaylistById(id);
+    const playlist = await this._playlistService.getPlaylistById(id);
 
     const message = {
-      playlist: result,
+      playlist,
       targetEmail: request.payload.targetEmail,
     };
 

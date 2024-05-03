@@ -73,8 +73,6 @@ class PlaylistsService {
 
     playlist.songs = songResult.rows;
 
-    console.log(`Sesudah ${playlist}`);
-
     return playlist;
   }
 

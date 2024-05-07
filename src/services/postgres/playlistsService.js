@@ -66,7 +66,7 @@ class PlaylistsService {
 
     const querySongs = {
       text: 'SELECT id, title, performer FROM songs WHERE id = $1',
-      values: [song],
+      values: [song.rows[0].song_id],
     };
 
     const songResult = await this._pool.query(querySongs);
